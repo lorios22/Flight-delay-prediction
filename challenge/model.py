@@ -6,9 +6,9 @@ import xgboost as xgb
 class DelayModel:
     """A model for predicting flight delays.
 
-    This model uses XGBoost to predict whether a flight will be delayed by 
-    more than 15 minutes. It preprocesses raw flight data into features and 
-    handles class imbalance during training.
+    This model uses XGBoost to predict whether a flight will be delayed
+    by more than 15 minutes. It preprocesses raw flight data into features
+    and handles class imbalance during training.
     """
 
     def __init__(self) -> None:
@@ -35,8 +35,10 @@ class DelayModel:
         """Prepare raw data for training or prediction.
 
         Args:
-            data: Raw flight data containing features like OPERA, TIPOVUELO, MES
-            target_column: Name of target column. If provided, calculates labels
+            data: Raw flight data containing features like OPERA,
+                TIPOVUELO, MES
+            target_column: Name of target column. If provided,
+                calculates labels
 
         Returns:
             Either a tuple of (features, target) if target_column is provided,
@@ -77,7 +79,8 @@ class DelayModel:
             data: DataFrame containing OPERA, TIPOVUELO and MES columns
 
         Returns:
-            DataFrame with one-hot encoded features, filtered to top 10 important
+            DataFrame with one-hot encoded features, filtered to top 10
+            important ones
         """
         features = pd.concat([
             pd.get_dummies(data['OPERA'], prefix='OPERA'),
