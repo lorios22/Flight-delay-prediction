@@ -4,6 +4,7 @@ from typing import List, Dict
 import pandas as pd
 from challenge.model import DelayModel
 
+
 app = FastAPI(
     title="Flight Delay Prediction API",
     description="API for predicting flight delays at SCL airport",
@@ -15,6 +16,7 @@ model = DelayModel()
 
 class Flight(BaseModel):
     """Flight data for making delay predictions."""
+
     OPERA: str
     TIPOVUELO: str
     MES: int
@@ -27,6 +29,7 @@ class Flight(BaseModel):
 
 class FlightRequest(BaseModel):
     """Request body containing list of flights."""
+
     flights: List[Flight]
 
 
