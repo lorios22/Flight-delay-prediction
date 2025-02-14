@@ -14,10 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: '3.9'
         
@@ -27,14 +28,13 @@ jobs:
         pip install -r requirements.txt
         pip install -r requirements-test.txt
         pip install -r requirements-dev.txt
-        pip install locust  # Aseguramos que locust está instalado
+        pip install locust
     
     - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@v0
+      uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        export_default_credentials: true
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
         
     - name: Build and push Docker image
       run: |
@@ -53,12 +53,10 @@ jobs:
     - name: Wait for deployment and run stress tests
       run: |
         echo "Waiting for deployment to stabilize..."
-        sleep 30  # Aumentamos el tiempo de espera para asegurar que el servicio esté listo
+        sleep 30
         
-        # Crear directorio para reportes
         mkdir -p reports
         
-        # Ejecutar pruebas de stress
         locust -f tests/stress/api_stress.py \
           --print-stats \
           --html reports/stress-test.html \
@@ -69,8 +67,8 @@ jobs:
           -H https://flight-delay-api-597687220466.us-central1.run.app
         
     - name: Upload stress test results
-      if: always()  # Subir resultados incluso si el test falla
-      uses: actions/upload-artifact@v2
+      if: always()
+      uses: actions/upload-artifact@v3  # Updated to v3
       with:
         name: stress-test-results
         path: reports/stress-test.html
