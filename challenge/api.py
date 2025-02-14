@@ -15,14 +15,14 @@ model = DelayModel()
 class Flight(BaseModel):
     """Flight data for making delay predictions."""
     OPERA: str
-    TIPOVUELO: str  
+    TIPOVUELO: str
     MES: int
 
     class Config:
         schema_extra = {
             "example": {
                 "OPERA": "Grupo LATAM",
-                "TIPOVUELO": "N", 
+                "TIPOVUELO": "N",
                 "MES": 7
             }
         }
