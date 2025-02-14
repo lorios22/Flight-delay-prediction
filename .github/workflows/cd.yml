@@ -36,9 +36,12 @@ jobs:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         credentials_json: ${{ secrets.GCP_SA_KEY }}
         
+    - name: Configure Docker for GCR
+      run: |
+        gcloud auth configure-docker gcr.io --quiet
+        
     - name: Build and push Docker image
       run: |
-        gcloud auth configure-docker
         docker build -t gcr.io/$PROJECT_ID/$SERVICE:${{ github.sha }} .
         docker push gcr.io/$PROJECT_ID/$SERVICE:${{ github.sha }}
         
@@ -68,7 +71,7 @@ jobs:
         
     - name: Upload stress test results
       if: always()
-      uses: actions/upload-artifact@v4  # Updated to v4
+      uses: actions/upload-artifact@v4
       with:
         name: stress-test-results
         path: reports/stress-test.html
