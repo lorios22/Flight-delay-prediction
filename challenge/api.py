@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, constr, conint
+from pydantic import BaseModel
 from typing import List, Dict
 import pandas as pd
 from challenge.model import DelayModel

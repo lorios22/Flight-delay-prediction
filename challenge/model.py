@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from typing import Tuple, Union, List
 import xgboost as xgb
 
