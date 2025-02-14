@@ -38,7 +38,7 @@ jobs:
         
     - name: Configure Docker for GCR
       run: |
-        gcloud auth configure-docker gcr.io --quiet
+        gcloud auth print-access-token | sudo docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev
         
     - name: Build and push Docker image
       run: |
@@ -47,7 +47,11 @@ jobs:
         
     - name: Deploy to Cloud Run
       run: |
-         gcloud run deploy flight-delay-api --image gcr.io/flight-delay-predictor-450814/flight-delay-api --platform managed  --region us-central1 --allow-unauthenticated
+        gcloud run deploy $SERVICE \
+          --image gcr.io/$PROJECT_ID/$SERVICE:${{ github.sha }} \
+          --platform managed \
+          --region $REGION \
+          --allow-unauthenticated
           
     - name: Wait for deployment and run stress tests
       run: |
