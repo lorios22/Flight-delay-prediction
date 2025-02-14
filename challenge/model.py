@@ -5,9 +5,10 @@ import xgboost as xgb
 
 class DelayModel:
     """A model for predicting flight delays.
-    
-    This model uses XGBoost to predict whether a flight will be delayed by more than 15 minutes.
-    It preprocesses raw flight data into features and handles class imbalance during training.
+
+    This model uses XGBoost to predict whether a flight will be delayed by 
+    more than 15 minutes. It preprocesses raw flight data into features and 
+    handles class imbalance during training.
     """
 
     def __init__(self) -> None:
@@ -15,11 +16,11 @@ class DelayModel:
         self._model = None
         self.top_10_features = [
             "OPERA_Latin American Wings",
-            "MES_7", 
+            "MES_7",
             "MES_10",
             "OPERA_Grupo LATAM",
             "MES_12",
-            "TIPOVUELO_I", 
+            "TIPOVUELO_I",
             "MES_4",
             "MES_11",
             "OPERA_Sky Airline",
@@ -35,7 +36,7 @@ class DelayModel:
 
         Args:
             data: Raw flight data containing features like OPERA, TIPOVUELO, MES
-            target_column: Name of target column. If provided, calculates delay labels
+            target_column: Name of target column. If provided, calculates labels
 
         Returns:
             Either a tuple of (features, target) if target_column is provided,
@@ -45,38 +46,38 @@ class DelayModel:
             data[target_column] = self._calculate_delay_labels(data)
 
         features = self._create_feature_matrix(data)
-        
+
         if target_column:
             target = pd.DataFrame(data[target_column], columns=[target_column])
             return features, target
-        
+
         return features
 
     def _calculate_delay_labels(self, data: pd.DataFrame) -> pd.Series:
         """Calculate binary delay labels from flight timestamps.
-        
+
         Args:
             data: DataFrame containing Fecha-I and Fecha-O columns
-            
+
         Returns:
             Series of binary delay labels (1 if delayed >15 min, 0 otherwise)
         """
         data['Fecha-I'] = pd.to_datetime(data['Fecha-I'])
         data['Fecha-O'] = pd.to_datetime(data['Fecha-O'])
-        
+
         min_diff = (data['Fecha-O'] - data['Fecha-I']).dt.total_seconds() / 60
         threshold_in_minutes = 15
-        
+
         return (min_diff > threshold_in_minutes).astype(int)
 
     def _create_feature_matrix(self, data: pd.DataFrame) -> pd.DataFrame:
         """Create feature matrix from categorical variables.
-        
+
         Args:
             data: DataFrame containing OPERA, TIPOVUELO and MES columns
-            
+
         Returns:
-            DataFrame with one-hot encoded features, filtered to top 10 important ones
+            DataFrame with one-hot encoded features, filtered to top 10 important
         """
         features = pd.concat([
             pd.get_dummies(data['OPERA'], prefix='OPERA'),
@@ -94,7 +95,7 @@ class DelayModel:
             target: DataFrame containing 'delay' column with binary labels
         """
         scale = self._calculate_class_weight(target)
-        
+
         self._model = xgb.XGBClassifier(
             random_state=1,
             learning_rate=0.01,
@@ -106,10 +107,10 @@ class DelayModel:
 
     def _calculate_class_weight(self, target: pd.DataFrame) -> float:
         """Calculate class weight to handle imbalanced classes.
-        
+
         Args:
             target: DataFrame containing 'delay' column
-            
+
         Returns:
             Weight to scale positive class during training
         """
@@ -128,6 +129,6 @@ class DelayModel:
         """
         if self._model is None:
             return [0] * features.shape[0]
-            
+
         predictions = self._model.predict(features)
         return predictions.tolist()
