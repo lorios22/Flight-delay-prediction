@@ -23,7 +23,7 @@ class Flight(BaseModel):
 
     class Config:
         schema_extra = {
-            "example": {"OPERA": "Grupo LATAM", "TIPOVUELO": "N", "MES": 7}
+            "example": {"OPERA": "Grupo LATAM", "TIPOVUELO": "N", "MES": 7},
         }
 
 
