@@ -24,13 +24,11 @@ class DelayModel:
             "MES_4",
             "MES_11",
             "OPERA_Sky Airline",
-            "OPERA_Copa Air"
+            "OPERA_Copa Air",
         ]
 
     def preprocess(
-        self,
-        data: pd.DataFrame,
-        target_column: str = None
+        self, data: pd.DataFrame, target_column: str = None
     ) -> Union[Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]:
         """Prepare raw data for training or prediction.
 
@@ -64,10 +62,10 @@ class DelayModel:
         Returns:
             Series of binary delay labels (1 if delayed >15 min, 0 otherwise)
         """
-        data['Fecha-I'] = pd.to_datetime(data['Fecha-I'])
-        data['Fecha-O'] = pd.to_datetime(data['Fecha-O'])
+        data["Fecha-I"] = pd.to_datetime(data["Fecha-I"])
+        data["Fecha-O"] = pd.to_datetime(data["Fecha-O"])
 
-        min_diff = (data['Fecha-O'] - data['Fecha-I']).dt.total_seconds() / 60
+        min_diff = (data["Fecha-O"] - data["Fecha-I"]).dt.total_seconds() / 60
         threshold_in_minutes = 15
 
         return (min_diff > threshold_in_minutes).astype(int)
@@ -82,11 +80,14 @@ class DelayModel:
             DataFrame with one-hot encoded features, filtered to top 10
             important ones
         """
-        features = pd.concat([
-            pd.get_dummies(data['OPERA'], prefix='OPERA'),
-            pd.get_dummies(data['TIPOVUELO'], prefix='TIPOVUELO'),
-            pd.get_dummies(data['MES'], prefix='MES')
-        ], axis=1)
+        features = pd.concat(
+            [
+                pd.get_dummies(data["OPERA"], prefix="OPERA"),
+                pd.get_dummies(data["TIPOVUELO"], prefix="TIPOVUELO"),
+                pd.get_dummies(data["MES"], prefix="MES"),
+            ],
+            axis=1,
+        )
 
         return features.reindex(columns=self.top_10_features, fill_value=0)
 
@@ -104,9 +105,9 @@ class DelayModel:
             learning_rate=0.01,
             scale_pos_weight=scale,
             max_depth=3,
-            min_child_weight=5
+            min_child_weight=5,
         )
-        self._model.fit(features, target['delay'])
+        self._model.fit(features, target["delay"])
 
     def _calculate_class_weight(self, target: pd.DataFrame) -> float:
         """Calculate class weight to handle imbalanced classes.
@@ -117,8 +118,8 @@ class DelayModel:
         Returns:
             Weight to scale positive class during training
         """
-        n_y0 = len(target[target['delay'] == 0])
-        n_y1 = len(target[target['delay'] == 1])
+        n_y0 = len(target[target["delay"] == 0])
+        n_y1 = len(target[target["delay"] == 1])
         return n_y0 / n_y1
 
     def predict(self, features: pd.DataFrame) -> List[int]:

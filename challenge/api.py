@@ -7,7 +7,7 @@ from challenge.model import DelayModel
 app = FastAPI(
     title="Flight Delay Prediction API",
     description="API for predicting flight delays at SCL airport",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 model = DelayModel()
@@ -21,11 +21,7 @@ class Flight(BaseModel):
 
     class Config:
         schema_extra = {
-            "example": {
-                "OPERA": "Grupo LATAM",
-                "TIPOVUELO": "N",
-                "MES": 7
-            }
+            "example": {"OPERA": "Grupo LATAM", "TIPOVUELO": "N", "MES": 7}
         }
 
 
@@ -37,9 +33,7 @@ class FlightRequest(BaseModel):
 @app.get("/health", status_code=200)
 async def get_health() -> Dict[str, str]:
     """Health check endpoint."""
-    return {
-        "status": "OK"
-    }
+    return {"status": "OK"}
 
 
 @app.post("/predict", status_code=200)
@@ -48,10 +42,10 @@ async def predict(request: FlightRequest) -> Dict[str, List[int]]:
     try:
         df = pd.DataFrame([flight.dict() for flight in request.flights])
 
-        if not df['MES'].between(1, 12).all():
+        if not df["MES"].between(1, 12).all():
             raise HTTPException(status_code=400, detail="Invalid month value")
 
-        if not df['TIPOVUELO'].isin(['N', 'I']).all():
+        if not df["TIPOVUELO"].isin(["N", "I"]).all():
             raise HTTPException(status_code=400, detail="Invalid flight type")
 
         features = model.preprocess(df)
