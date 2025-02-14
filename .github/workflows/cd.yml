@@ -35,11 +35,10 @@ jobs:
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         credentials_json: ${{ secrets.GCP_SA_KEY }}
-        export_default_credentials: true
         
     - name: Configure Docker for GCR
       run: |
-        gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+        gcloud auth print-access-token | sudo docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev
         
     - name: Build and push Docker image
       run: |
