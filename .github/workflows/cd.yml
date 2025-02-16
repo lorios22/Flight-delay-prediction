@@ -38,7 +38,8 @@ jobs:
         
     - name: Configure Docker for GCR
       run: |
-        gcloud auth login
+        echo "${{ secrets.GCP_SA_KEY }}" > gcp-sa-key.json
+        gcloud auth activate-service-account --key-file=gcp-sa-key.json
         gcloud auth print-access-token | sudo docker login -u oauth2accesstoken --password-stdin https://us-central1-docker.pkg.dev
         
     - name: Build and push Docker image
